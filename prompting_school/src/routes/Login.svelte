@@ -1,39 +1,36 @@
 <script>
     import { navigate } from 'svelte-routing';
-    let firstName = '';
-    let lastName = '';
-    let dateOfBirth = '';
     let email = '';
     let password = '';
 
-    async function handleSubmit() {
+    async function handleLogin() {
         try {
-            const response = await fetch('http://localhost:5000/register', {
+            const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    firstName,
-                    lastName,
-                    dateOfBirth,
                     email,
                     password
                 })
             });
             const data = await response.json();
             if (response.ok) {
-                console.log('User registered successfully:', data);
-                // Navigate to the login page after successful registration
-                navigate('/login');
+                console.log('User logged in successfully:', data);
+                // Store the token in localStorage
+                localStorage.setItem('authToken', data.token);
+                // Navigate to the course page after successful login
+                navigate('/course');
             } else {
-                console.error('Error registering user:', data.error);
+                console.error('Error logging in:', data.error);
             }
         } catch (error) {
-            console.error('Error registering user:', error);
+            console.error('Error logging in:', error);
         }
     }
 </script>
+
 
 <style>
     .form-container {
@@ -54,13 +51,12 @@
     .form-group label {
         flex: 1;
         margin-right: 10px;
-        display: block;
-        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
     }
 
     .form-group input {
         flex: 2;
-        width: 100%;
         padding: 8px;
         box-sizing: border-box;
     }
@@ -80,20 +76,8 @@
 </style>
 
 <div class="form-container">
-    <h2>Register</h2>
-    <form on:submit|preventDefault={handleSubmit}>
-        <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" bind:value={firstName} required />
-        </div>
-        <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" bind:value={lastName} required />
-        </div>
-        <div class="form-group">
-            <label for="dob">Date of Birth</label>
-            <input type="date" id="dob" bind:value={dateOfBirth} />
-        </div>
+    <h2>Log In</h2>
+    <form on:submit|preventDefault={handleLogin}>
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" bind:value={email} required />
@@ -103,7 +87,7 @@
             <input type="password" id="password" bind:value={password} required />
         </div>
         <div class="form-group">
-            <button type="submit">Register</button>
+            <button type="submit">Log In</button>
         </div>
     </form>
 </div>
